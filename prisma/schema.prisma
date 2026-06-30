@@ -1,0 +1,231 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  admin
+  gestor_trafego
+  auxiliar
+  corretor
+}
+
+enum TipoHierarquia {
+  diretoria
+  gerencia
+  individual
+}
+
+enum LocalAtendimento {
+  Paulista
+  Faria_Lima
+  Frei_Caneca
+  House_Paulista
+}
+
+enum StatusPresenca {
+  online
+  removido_corte
+  removido_manual
+  offline_manual
+}
+
+enum CicloPresenca {
+  manha_10_12
+  tarde_15_19
+}
+
+enum CicloFila {
+  c10_12
+  c12_15
+  c15_19
+  c19_22
+}
+
+enum JanelaOkGeral {
+  j10h
+  j12h
+  j15h
+  j19h
+}
+
+model User {
+  id                          String    @id @default(cuid())
+  nome                        String
+  email                       String    @unique
+  senhaHash                   String
+  role                        Role
+  senhaTrocadaNoPrimeiroAcesso Boolean  @default(false)
+  ativo                       Boolean   @default(true)
+  createdAt                   DateTime  @default(now())
+  updatedAt                   DateTime  @updatedAt
+
+  corretor                    Corretor?
+  okGeraisConfirmados         OkGeral[]
+  presencasRemovidas          PresencaDiaria[] @relation("RemovidoPor")
+  passwordResetTokens         PasswordResetToken[]
+
+  @@map("users")
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  @@map("password_reset_tokens")
+}
+
+model Gerencia {
+  id        String     @id @default(cuid())
+  nome      String     @unique
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  corretores Corretor[]
+  campanhas  Campanha[]
+  roletas    Roleta[]
+
+  @@map("gerencias")
+}
+
+model Corretor {
+  id           String            @id @default(cuid())
+  userId       String            @unique
+  user         User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  gerenciaId   String
+  gerencia     Gerencia          @relation(fields: [gerenciaId], references: [id])
+  localAtual   LocalAtendimento?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  roletaCorretores RoletaCorretor[]
+  presencas        PresencaDiaria[]
+  filaEntradas     FilaRoleta[]
+  leadsRecebidos   LeadRecebido[]
+
+  @@map("corretores")
+}
+
+model Roleta {
+  id         String         @id @default(cuid())
+  nome       String
+  tipo       TipoHierarquia
+  gerenciaId String?
+  gerencia   Gerencia?      @relation(fields: [gerenciaId], references: [id])
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+
+  campanhas        Campanha[]
+  roletaCorretores RoletaCorretor[]
+  filaEntradas     FilaRoleta[]
+  leadsRecebidos   LeadRecebido[]
+
+  @@map("roletas")
+}
+
+model RoletaCorretor {
+  roletaId   String
+  corretorId String
+  roleta     Roleta   @relation(fields: [roletaId], references: [id], onDelete: Cascade)
+  corretor   Corretor @relation(fields: [corretorId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@id([roletaId, corretorId])
+  @@map("roleta_corretores")
+}
+
+model Campanha {
+  id             String         @id @default(cuid())
+  nome           String         @unique
+  tipoHierarquia TipoHierarquia
+  gerenciaId     String?
+  gerencia       Gerencia?      @relation(fields: [gerenciaId], references: [id])
+  roletaId       String
+  roleta         Roleta         @relation(fields: [roletaId], references: [id])
+  ativa          Boolean        @default(true)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  leadsRecebidos LeadRecebido[]
+
+  @@map("campanhas")
+}
+
+model PresencaDiaria {
+  id                    String           @id @default(cuid())
+  corretorId            String
+  corretor              Corretor         @relation(fields: [corretorId], references: [id], onDelete: Cascade)
+  data                  DateTime         @db.Date
+  ciclo                 CicloPresenca
+  entradaMarcadaEm      DateTime
+  manterOnlineMarcadoEm DateTime?
+  status                StatusPresenca   @default(online)
+  removidoPorId         String?
+  removidoPor           User?            @relation("RemovidoPor", fields: [removidoPorId], references: [id])
+  localNoMomento        LocalAtendimento?
+  createdAt             DateTime         @default(now())
+  updatedAt             DateTime         @updatedAt
+
+  @@unique([corretorId, data, ciclo])
+  @@map("presencas_diarias")
+}
+
+model FilaRoleta {
+  id             String    @id @default(cuid())
+  roletaId       String
+  roleta         Roleta    @relation(fields: [roletaId], references: [id], onDelete: Cascade)
+  data           DateTime  @db.Date
+  ciclo          CicloFila
+  posicao        Int
+  corretorId     String
+  corretor       Corretor  @relation(fields: [corretorId], references: [id], onDelete: Cascade)
+  recebeuLeadEm  DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@unique([roletaId, data, ciclo, posicao])
+  @@unique([roletaId, data, ciclo, corretorId])
+  @@map("fila_roletas")
+}
+
+model OkGeral {
+  id                      String        @id @default(cuid())
+  data                    DateTime      @db.Date
+  janela                  JanelaOkGeral
+  confirmadoPorId         String?
+  confirmadoPor           User?         @relation(fields: [confirmadoPorId], references: [id])
+  confirmadoAutomaticamente Boolean     @default(false)
+  timestamp               DateTime      @default(now())
+  createdAt               DateTime      @default(now())
+
+  @@unique([data, janela])
+  @@map("ok_gerais")
+}
+
+model LeadRecebido {
+  id                  String    @id @default(cuid())
+  campanhaId          String
+  campanha            Campanha  @relation(fields: [campanhaId], references: [id])
+  roletaId            String
+  roleta              Roleta    @relation(fields: [roletaId], references: [id])
+  corretorDesignadoId String?
+  corretorDesignado   Corretor? @relation(fields: [corretorDesignadoId], references: [id])
+  nomeLead            String?
+  telefoneLead        String?
+  emailLead           String?
+  respostaEnviada     String
+  cicloAtivo          CicloFila?
+  timestamp           DateTime  @default(now())
+  createdAt           DateTime  @default(now())
+
+  @@map("leads_recebidos")
+}
