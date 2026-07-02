@@ -177,7 +177,7 @@ export default function CorretorPage() {
 
       {fila.cicloAtivo && fila.posicoes.length === 0 && online && (
         <div className="card" style={{ textAlign: 'center', color: 'var(--text-muted)', padding: 32 }}>
-          Aguardando a construção da fila (ok geral do auxiliar)...
+          Aguardando a ativação da roleta pelo auxiliar...
         </div>
       )}
     </div>

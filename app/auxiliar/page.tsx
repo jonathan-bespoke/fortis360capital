@@ -51,7 +51,7 @@ export default function AuxiliarPage() {
     })
     setLoading(false)
     if (res.ok) {
-      setMsg('Ok geral dado! Fila construída.')
+      setMsg('Roleta ativada! Fila construída.')
       carregar()
     } else {
       const d = await res.json()
@@ -85,11 +85,11 @@ export default function AuxiliarPage() {
           {dados?.janelaOkGeral && (
             dados.okGeralJaDado ? (
               <span className="badge badge-green" style={{ fontSize: 13, padding: '6px 14px' }}>
-                ✓ Ok geral ({janelaLabel[dados.janelaOkGeral]}) confirmado
+                ✓ Roleta ativada ({janelaLabel[dados.janelaOkGeral]})
               </span>
             ) : (
               <button className="btn btn-success" onClick={darOkGeral} disabled={loading}>
-                {loading ? <span className="spinner" /> : `⚑ Ok geral (${janelaLabel[dados.janelaOkGeral]})`}
+                {loading ? <span className="spinner" /> : `⚑ Ativar Roleta (${janelaLabel[dados.janelaOkGeral]})`}
               </button>
             )
           )}

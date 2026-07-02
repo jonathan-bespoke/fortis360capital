@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
   const janelaPermitida = janelaPreWindow ?? (cicloAtivo ? CICLO_JANELA[cicloAtivo] : null)
 
   if (!janelaPermitida || janelaPermitida !== janela) {
-    return NextResponse.json({ erro: 'Nenhum ciclo ativo para este ok geral' }, { status: 400 })
+    return NextResponse.json({ erro: 'Nenhum ciclo ativo para ativar a roleta' }, { status: 400 })
   }
 
   const data = hojeStringBRT()
@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
   })
 
   if (jaConfirmado) {
-    return NextResponse.json({ erro: 'Ok geral já foi dado para esta janela' }, { status: 409 })
+    return NextResponse.json({ erro: 'Roleta já foi ativada para esta janela' }, { status: 409 })
   }
 
   const cicloMap: Record<string, CicloFila> = {

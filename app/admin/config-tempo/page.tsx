@@ -4,16 +4,16 @@ import { useEffect, useState } from 'react'
 
 const horariosSugeridos = [
   { label: 'Entrada manhã (9h00)', valor: '09:00' },
-  { label: 'Ok geral manhã (9h47)', valor: '09:47' },
+  { label: 'Ativar roleta manhã (9h47)', valor: '09:47' },
   { label: 'Início ciclo manhã (10h05)', valor: '10:05' },
   { label: 'Manter-online manhã (11h30)', valor: '11:30' },
-  { label: 'Ok geral 12h (11h47)', valor: '11:47' },
+  { label: 'Ativar roleta 12h (11h47)', valor: '11:47' },
   { label: 'Corte meio-dia (12h05)', valor: '12:05' },
   { label: 'Entrada tarde (14h00)', valor: '14:00' },
-  { label: 'Ok geral tarde (14h47)', valor: '14:47' },
+  { label: 'Ativar roleta tarde (14h47)', valor: '14:47' },
   { label: 'Início ciclo tarde (15h05)', valor: '15:05' },
   { label: 'Manter-online tarde (18h30)', valor: '18:30' },
-  { label: 'Ok geral 19h (18h47)', valor: '18:47' },
+  { label: 'Ativar roleta 19h (18h47)', valor: '18:47' },
   { label: 'Corte noite (19h05)', valor: '19:05' },
   { label: 'Corte geral (22h05)', valor: '22:05' },
 ]
@@ -152,7 +152,7 @@ export default function ConfigTempoPage() {
         <ul style={{ paddingLeft: 16, display: 'flex', flexDirection: 'column', gap: 4 }}>
           <li>Quando ativo, <strong>todo o sistema</strong> passa a usar o horário definido aqui.</li>
           <li>Corretores verão os botões corretos para aquela janela de tempo.</li>
-          <li>O auxiliar verá os botões de ok geral correspondentes.</li>
+          <li>O auxiliar verá os botões de ativar roleta correspondentes.</li>
           <li>O webhook de leads também usará o ciclo daquele horário.</li>
           <li>Quando desativado, volta ao horário real de Brasília automaticamente.</li>
           <li style={{ color: 'var(--warning)' }}>Lembre de desativar antes de ir para produção!</li>
