@@ -106,7 +106,7 @@ export default function AuxiliarPage() {
             <h2 style={{ fontSize: 15, fontWeight: 600, marginBottom: 12 }}>Filas ativas</h2>
             <div className="grid-3">
               {dados.roletas.map((r) => (
-                <div key={r.id} className="card">
+                <div key={r.id} className="card" style={{ cursor: 'default' }}>
                   <div style={{ fontWeight: 600, marginBottom: 4 }}>{r.nome}</div>
                   <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 12 }}>
                     {r.tipo === 'gerencia' ? r.gerencia : r.tipo}

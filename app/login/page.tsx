@@ -34,11 +34,11 @@ export default function LoginPage() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div className="card" style={{ width: 360 }}>
-        <div style={{ textAlign: 'center', marginBottom: 24 }}>
-          <div style={{ fontSize: 22, fontWeight: 700, marginBottom: 4 }}>Fortis360 Capital</div>
-          <div style={{ color: 'var(--text-muted)', fontSize: 13 }}>Roleta de Leads</div>
+    <div className="login-wrap">
+      <div className="card" style={{ width: '100%', maxWidth: 380 }}>
+        <div style={{ textAlign: 'center', marginBottom: 28 }}>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem', fontWeight: 600, letterSpacing: '0.18em', textTransform: 'uppercase', background: 'var(--gold-shine)', WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent', marginBottom: 6 }}>Fortis360</div>
+          <div style={{ color: 'var(--text-muted)', fontSize: '0.8125rem', letterSpacing: '0.06em', textTransform: 'uppercase' }}>Roleta de Leads</div>
         </div>
 
         {erro && <div className="alert alert-error">{erro}</div>}
