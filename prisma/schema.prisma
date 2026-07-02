@@ -72,6 +72,13 @@ model User {
   @@map("users")
 }
 
+model ConfigSistema {
+  chave String @id
+  valor String?
+
+  @@map("config_sistema")
+}
+
 model PasswordResetToken {
   id        String   @id @default(cuid())
   token     String   @unique

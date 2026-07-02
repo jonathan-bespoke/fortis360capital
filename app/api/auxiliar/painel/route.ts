@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getSession } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { getCicloAtivo, hojeStringBRT } from '@/lib/horarios'
+import { getCicloAtivo, hojeStringBRT, getTempoAtual } from '@/lib/horarios'
 
 export async function GET() {
   const session = await getSession()
@@ -10,7 +10,8 @@ export async function GET() {
     return NextResponse.json({ erro: 'Não autorizado' }, { status: 403 })
   }
 
-  const ciclo = getCicloAtivo()
+  const agora = await getTempoAtual()
+  const ciclo = getCicloAtivo(agora)
   const data = hojeStringBRT()
   const dataDate = new Date(data + 'T00:00:00')
 
@@ -35,6 +36,7 @@ export async function GET() {
   return NextResponse.json({
     cicloAtivo: ciclo,
     data,
+    horaAtual: agora.toISOString(),
     roletas: roletas.map((r: any) => ({
       id: r.id,
       nome: r.nome,

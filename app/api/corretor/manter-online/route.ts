@@ -1,12 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getSession } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import {
-  isJanelaManterOnlineManha,
-  isJanelaManterOnlineTarde,
-  hojeStringBRT,
-  agoraBRT,
-} from '@/lib/horarios'
+import { isJanelaManterOnlineManha, isJanelaManterOnlineTarde, hojeStringBRT, getTempoAtual } from '@/lib/horarios'
 
 export async function POST() {
   const session = await getSession()
@@ -15,7 +10,7 @@ export async function POST() {
   }
 
   const userId = (session?.user as any)?.id
-  const agora = agoraBRT()
+  const agora = await getTempoAtual()
   const isManha = isJanelaManterOnlineManha(agora)
   const isTarde = isJanelaManterOnlineTarde(agora)
 

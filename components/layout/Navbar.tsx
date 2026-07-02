@@ -11,6 +11,7 @@ const roleLinks: Record<string, { href: string; label: string }[]> = {
     { href: '/admin/roletas', label: 'Roletas' },
     { href: '/admin/campanhas', label: 'Campanhas' },
     { href: '/admin/logs', label: 'Logs' },
+    { href: '/admin/config-tempo', label: 'Modo Teste' },
   ],
   gestor_trafego: [
     { href: '/gestor/campanhas', label: 'Campanhas' },

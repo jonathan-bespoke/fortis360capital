@@ -1,4 +1,5 @@
 import { toZonedTime, fromZonedTime } from 'date-fns-tz'
+import { prisma } from '@/lib/prisma'
 
 export const TZ = 'America/Sao_Paulo'
 
@@ -10,6 +11,19 @@ export function agoraBRT(): Date {
     return toZonedTime(new Date(process.env.FAKE_NOW), TZ)
   }
   return toZonedTime(new Date(), TZ)
+}
+
+// Versão async que lê o fake_now do banco (usar nas API routes)
+export async function getTempoAtual(): Promise<Date> {
+  try {
+    const cfg = await prisma.configSistema.findUnique({ where: { chave: 'fake_now' } })
+    if (cfg?.valor) {
+      return toZonedTime(new Date(cfg.valor), TZ)
+    }
+  } catch {
+    // fallback silencioso
+  }
+  return agoraBRT()
 }
 
 export function hojeBRT(): Date {

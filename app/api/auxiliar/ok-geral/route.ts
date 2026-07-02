@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSession } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { construirTodasAsFilas } from '@/services/roleta'
-import { getJanelaOkGeralAtiva, hojeStringBRT, CicloFila } from '@/lib/horarios'
+import { getJanelaOkGeralAtiva, hojeStringBRT, CicloFila, getTempoAtual } from '@/lib/horarios'
 
 export async function POST(req: NextRequest) {
   const session = await getSession()
@@ -12,7 +12,8 @@ export async function POST(req: NextRequest) {
   }
 
   const { janela } = await req.json()
-  const janelaAtiva = getJanelaOkGeralAtiva()
+  const agora = await getTempoAtual()
+  const janelaAtiva = getJanelaOkGeralAtiva(agora)
 
   if (!janelaAtiva || janelaAtiva !== janela) {
     return NextResponse.json({ erro: 'Janela de ok geral não está ativa agora' }, { status: 400 })

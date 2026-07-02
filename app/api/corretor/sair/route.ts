@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getSession } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { getCicloAtivo, hojeStringBRT } from '@/lib/horarios'
+import { getCicloAtivo, hojeStringBRT, getTempoAtual } from '@/lib/horarios'
 
 export async function POST() {
   const session = await getSession()
@@ -13,24 +13,18 @@ export async function POST() {
   const corretor = await prisma.corretor.findUnique({ where: { userId } })
   if (!corretor) return NextResponse.json({ erro: 'Corretor não encontrado' }, { status: 404 })
 
+  const agora = await getTempoAtual()
   const data = hojeStringBRT()
   const dataDate = new Date(data + 'T00:00:00')
-  const ciclo = getCicloAtivo()
+  const ciclo = getCicloAtivo(agora)
 
   await prisma.presencaDiaria.updateMany({
-    where: {
-      corretorId: corretor.id,
-      data: dataDate,
-      status: 'online',
-    },
+    where: { corretorId: corretor.id, data: dataDate, status: 'online' },
     data: { status: 'offline_manual' },
   })
 
-  // Remove da fila ativa
   if (ciclo) {
-    await prisma.filaRoleta.deleteMany({
-      where: { corretorId: corretor.id, data: dataDate, ciclo },
-    })
+    await prisma.filaRoleta.deleteMany({ where: { corretorId: corretor.id, data: dataDate, ciclo } })
   }
 
   return NextResponse.json({ ok: true })

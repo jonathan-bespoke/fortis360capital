@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSession } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { isJanelaEntradaManha, isJanelaEntradaTarde, hojeStringBRT, agoraBRT } from '@/lib/horarios'
+import { isJanelaEntradaManha, isJanelaEntradaTarde, hojeStringBRT, getTempoAtual } from '@/lib/horarios'
 
 export async function POST(req: NextRequest) {
   const session = await getSession()
@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
   const userId = (session?.user as any)?.id
   const { local } = await req.json()
 
-  const agora = agoraBRT()
+  const agora = await getTempoAtual()
   const isManha = isJanelaEntradaManha(agora)
   const isTarde = isJanelaEntradaTarde(agora)
 
@@ -28,12 +28,10 @@ export async function POST(req: NextRequest) {
   const data = hojeStringBRT()
   const dataDate = new Date(data + 'T00:00:00')
 
-  // Atualiza local atual
   if (local) {
     await prisma.corretor.update({ where: { id: corretor.id }, data: { localAtual: local } })
   }
 
-  // Cria presença (upsert para idempotência)
   const presenca = await prisma.presencaDiaria.upsert({
     where: { corretorId_data_ciclo: { corretorId: corretor.id, data: dataDate, ciclo } },
     create: {
@@ -65,7 +63,7 @@ export async function GET() {
 
   const data = hojeStringBRT()
   const dataDate = new Date(data + 'T00:00:00')
-  const agora = agoraBRT()
+  const agora = await getTempoAtual()
 
   const presencas = await prisma.presencaDiaria.findMany({
     where: { corretorId: corretor.id, data: dataDate },

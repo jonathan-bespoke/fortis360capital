@@ -1,7 +1,15 @@
 import { NextResponse } from 'next/server'
 import { getSession } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { getCicloAtivo, hojeStringBRT, isJanelaManterOnlineManha, isJanelaManterOnlineTarde, isJanelaEntradaManha, isJanelaEntradaTarde, agoraBRT } from '@/lib/horarios'
+import {
+  getCicloAtivo,
+  hojeStringBRT,
+  isJanelaManterOnlineManha,
+  isJanelaManterOnlineTarde,
+  isJanelaEntradaManha,
+  isJanelaEntradaTarde,
+  getTempoAtual,
+} from '@/lib/horarios'
 
 export async function GET() {
   const session = await getSession()
@@ -13,8 +21,8 @@ export async function GET() {
   const corretor = await prisma.corretor.findUnique({ where: { userId } })
   if (!corretor) return NextResponse.json({ erro: 'Não encontrado' }, { status: 404 })
 
-  const ciclo = getCicloAtivo()
-  const agora = agoraBRT()
+  const agora = await getTempoAtual()
+  const ciclo = getCicloAtivo(agora)
 
   const data = hojeStringBRT()
   const dataDate = new Date(data + 'T00:00:00')
@@ -32,7 +40,6 @@ export async function GET() {
     })
   }
 
-  // Busca posição em todas as roletas em que o corretor aparece
   const posicoes = await prisma.filaRoleta.findMany({
     where: { corretorId: corretor.id, data: dataDate, ciclo },
     include: { roleta: true },
