@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 
 export const TZ = 'America/Sao_Paulo'
 
+
 export type CicloFila = 'c10_12' | 'c12_15' | 'c15_19' | 'c19_22'
 export type JanelaOkGeral = 'j10h' | 'j12h' | 'j15h' | 'j19h'
 
