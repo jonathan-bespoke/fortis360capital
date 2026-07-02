@@ -6,6 +6,9 @@ export type CicloFila = 'c10_12' | 'c12_15' | 'c15_19' | 'c19_22'
 export type JanelaOkGeral = 'j10h' | 'j12h' | 'j15h' | 'j19h'
 
 export function agoraBRT(): Date {
+  if (process.env.FAKE_NOW) {
+    return toZonedTime(new Date(process.env.FAKE_NOW), TZ)
+  }
   return toZonedTime(new Date(), TZ)
 }
 
