@@ -40,29 +40,47 @@ export async function GET() {
     })
   }
 
-  const posicoes = await prisma.filaRoleta.findMany({
+  // Roletas onde o corretor tem posição no ciclo atual
+  const minhasEntradas = await prisma.filaRoleta.findMany({
     where: { corretorId: corretor.id, data: dataDate, ciclo },
-    include: { roleta: true },
-    orderBy: { posicao: 'asc' },
+    include: { roleta: { include: { gerencia: true } } },
   })
 
-  const totalPorRoleta = await Promise.all(
-    posicoes.map(async (p: any) => {
-      const total = await prisma.filaRoleta.count({
-        where: { roletaId: p.roletaId, data: dataDate, ciclo },
+  const roletaIds = minhasEntradas.map((e: any) => e.roletaId)
+
+  // Fila completa de cada roleta onde o corretor está presente
+  const filasCompletas = await Promise.all(
+    roletaIds.map(async (roletaId: string) => {
+      const entrada = minhasEntradas.find((e: any) => e.roletaId === roletaId)!
+      const fila = await prisma.filaRoleta.findMany({
+        where: { roletaId, data: dataDate, ciclo },
+        include: { corretor: { include: { user: true } } },
+        orderBy: { posicao: 'asc' },
       })
-      return { ...p, total }
+      return {
+        roletaId,
+        nome: entrada.roleta.nome,
+        tipo: entrada.roleta.tipo,
+        gerencia: (entrada.roleta as any).gerencia?.nome ?? null,
+        minhaPosicao: entrada.posicao,
+        fila: fila.map((f: any) => ({
+          posicao: f.posicao,
+          corretorId: f.corretorId,
+          nome: f.corretor.user.nome,
+          souEu: f.corretorId === corretor.id,
+          recebeuLeadEm: f.recebeuLeadEm,
+        })),
+      }
     }),
   )
 
+  // Hierarquia: diretoria → gerencia → individual
+  const ordemTipo: Record<string, number> = { diretoria: 0, gerencia: 1, individual: 2 }
+  filasCompletas.sort((a, b) => (ordemTipo[a.tipo] ?? 9) - (ordemTipo[b.tipo] ?? 9))
+
   return NextResponse.json({
     cicloAtivo: ciclo,
-    posicoes: totalPorRoleta.map((p: any) => ({
-      roleta: p.roleta.nome,
-      tipo: p.roleta.tipo,
-      posicao: p.posicao,
-      totalNaFila: p.total,
-    })),
+    filas: filasCompletas,
     janelas: {
       entradaManha: isJanelaEntradaManha(agora),
       entradaTarde: isJanelaEntradaTarde(agora),
