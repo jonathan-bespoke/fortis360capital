@@ -2,6 +2,7 @@
 
 import { signOut, useSession } from 'next-auth/react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import { useTheme } from '@/components/ThemeProvider'
@@ -36,7 +37,9 @@ export default function Navbar() {
   return (
     <>
       <nav className="nav">
-        <span className="nav-logo">Fortis360</span>
+        <Link href="/" className="nav-logo">
+          <Image src="/logo-horizontal.png" alt="Fortis 360 Capital" height={28} width={160} style={{ objectFit: 'contain', height: 28, width: 'auto' }} priority />
+        </Link>
 
         {/* Links desktop */}
         <div className="nav-links">

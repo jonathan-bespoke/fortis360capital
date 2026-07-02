@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap');
 
 /* ==========================================================================
    FORTIS 360 CAPITAL — Design System + Liquid Glass
@@ -25,7 +25,7 @@
   --error:   #C1685E;
   --info:    #7B9FB0;
 
-  --font-display: 'Cormorant Garamond', 'Playfair Display', serif;
+  --font-display: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-body:    'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 
   --radius-sm:   4px;
@@ -190,62 +190,33 @@ label {
 /* Vidro padrão — cards, painéis, modais */
 .glass {
   position: relative;
-  background: var(--glass-fill);
-  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-lg);
-  box-shadow:
-    inset 0 1px 0 var(--glass-highlight),
-    var(--shadow-lg);
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 24px;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
 }
 
-/* Highlight especular no topo — reflexo de luz na borda do vidro */
-.glass::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(
-    180deg,
-    rgba(222, 187, 85, 0.45) 0%,
-    rgba(222, 187, 85, 0.08) var(--glass-specular-size),
-    transparent 40%
-  );
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
+[data-theme="light"] .glass {
+  background: rgba(255, 255, 255, 0.55);
+  border-color: rgba(255, 255, 255, 0.45);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
 }
 
 /* Vidro forte — reservado pra navbar */
 .glass-strong {
   position: relative;
-  background: var(--glass-fill-strong);
-  backdrop-filter: blur(28px) saturate(1.8);
-  -webkit-backdrop-filter: blur(28px) saturate(1.8);
-  border: 1px solid var(--glass-border-strong);
-  box-shadow:
-    inset 0 1px 0 var(--glass-highlight),
-    var(--shadow-lg), var(--shadow-gold);
+  background: rgba(255, 255, 255, 0.10);
+  backdrop-filter: blur(28px) saturate(200%);
+  -webkit-backdrop-filter: blur(28px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.08), var(--shadow-gold);
 }
-.glass-strong::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(
-    180deg,
-    rgba(222, 187, 85, 0.55) 0%,
-    rgba(222, 187, 85, 0.10) var(--glass-specular-size),
-    transparent 40%
-  );
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
+
+[data-theme="light"] .glass-strong {
+  background: rgba(255, 255, 255, 0.70);
+  border-color: rgba(255, 255, 255, 0.60);
 }
 
 /* Sólido — badges e botões DENTRO de vidro (nunca empilhar blur) */
@@ -355,35 +326,23 @@ select {
    ========================================================================== */
 .card {
   position: relative;
-  background: var(--glass-fill);
-  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-lg);
-  box-shadow: inset 0 1px 0 var(--glass-highlight), var(--shadow-md);
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 24px;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
   padding: 16px;
   transition: transform var(--ease-base), box-shadow var(--ease-base);
 }
-.card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(
-    180deg,
-    rgba(222, 187, 85, 0.40) 0%,
-    rgba(222, 187, 85, 0.06) var(--glass-specular-size),
-    transparent 35%
-  );
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
+[data-theme="light"] .card {
+  background: rgba(255, 255, 255, 0.55);
+  border-color: rgba(255, 255, 255, 0.45);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
 }
 .card:hover {
   transform: translateY(-2px);
-  box-shadow: inset 0 1px 0 var(--glass-highlight), var(--shadow-lg), var(--shadow-gold);
+  box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.10), var(--shadow-gold);
 }
 @media (min-width: 640px) {
   .card { padding: 20px; }
@@ -478,51 +437,27 @@ tr:hover td { background: rgba(222, 187, 85, 0.05); }
   display: flex;
   align-items: center;
 
-  /* Glass forte — 1 por tela */
-  background: var(--glass-fill-strong);
-  backdrop-filter: blur(28px) saturate(1.8);
-  -webkit-backdrop-filter: blur(28px) saturate(1.8);
-  border: 1px solid var(--glass-border-strong);
+  background: rgba(255, 255, 255, 0.10);
+  backdrop-filter: blur(28px) saturate(200%);
+  -webkit-backdrop-filter: blur(28px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: var(--radius-pill);
-  box-shadow:
-    inset 0 1px 0 var(--glass-highlight),
-    var(--shadow-lg), var(--shadow-gold);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.08), var(--shadow-gold);
 
   transition: background var(--ease-base);
 }
 
-/* Highlight especular da navbar */
-.nav::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(
-    180deg,
-    rgba(222, 187, 85, 0.55) 0%,
-    rgba(222, 187, 85, 0.10) var(--glass-specular-size),
-    transparent 40%
-  );
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
+[data-theme="light"] .nav {
+  background: rgba(255, 255, 255, 0.70);
+  border-color: rgba(255, 255, 255, 0.60);
 }
 
 .nav-logo {
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 0.9375rem;
-  letter-spacing: 0.20em;
-  text-transform: uppercase;
-  background: var(--gold-shine);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
   flex-shrink: 0;
   margin-right: auto;
-  position: relative; /* acima do ::before */
+  display: flex;
+  align-items: center;
+  text-decoration: none;
 }
 
 .nav-links {

@@ -37,7 +37,9 @@ export default function LoginPage() {
     <div className="login-wrap">
       <div className="card" style={{ width: '100%', maxWidth: 380 }}>
         <div style={{ textAlign: 'center', marginBottom: 28 }}>
-          <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem', fontWeight: 600, letterSpacing: '0.18em', textTransform: 'uppercase', background: 'var(--gold-shine)', WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent', marginBottom: 6 }}>Fortis360</div>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 10 }}>
+            <img src="/logo-square.png" alt="Fortis 360 Capital" style={{ height: 84, width: 'auto', objectFit: 'contain' }} />
+          </div>
           <div style={{ color: 'var(--text-muted)', fontSize: '0.8125rem', letterSpacing: '0.06em', textTransform: 'uppercase' }}>Roleta de Leads</div>
         </div>
 
