@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma'
-import { getCicloAtivo, hojeBRT, hojeStringBRT, CicloFila, notifyWindowOpened } from '@/lib/horarios'
+import { getCicloAtivo, hojeStringBRT, CicloFila, getTempoAtual } from '@/lib/horarios'
 
 // Retorna os corretores online no ciclo atual para uma roleta
 export async function getCorretoresOnlineParaRoleta(
@@ -97,8 +97,9 @@ export async function distribuirLead(params: {
   telefoneLead?: string
   emailLead?: string
 }): Promise<string> {
-  const ciclo = getCicloAtivo()
-  const data = hojeStringBRT()
+  const agora = await getTempoAtual()
+  const ciclo = getCicloAtivo(agora)
+  const data = `${agora.getFullYear()}-${String(agora.getMonth() + 1).padStart(2, '0')}-${String(agora.getDate()).padStart(2, '0')}`
   const dataDate = new Date(data + 'T00:00:00')
 
   const roleta = await prisma.roleta.findUniqueOrThrow({ where: { id: params.roletaId } })
