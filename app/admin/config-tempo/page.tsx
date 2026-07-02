@@ -4,12 +4,16 @@ import { useEffect, useState } from 'react'
 
 const horariosSugeridos = [
   { label: 'Entrada manhã (9h00)', valor: '09:00' },
-  { label: 'Ok geral / início ciclo (10h05)', valor: '10:05' },
+  { label: 'Ok geral manhã (9h47)', valor: '09:47' },
+  { label: 'Início ciclo manhã (10h05)', valor: '10:05' },
   { label: 'Manter-online manhã (11h30)', valor: '11:30' },
+  { label: 'Ok geral 12h (11h47)', valor: '11:47' },
   { label: 'Corte meio-dia (12h05)', valor: '12:05' },
   { label: 'Entrada tarde (14h00)', valor: '14:00' },
-  { label: 'Ok geral tarde (15h05)', valor: '15:05' },
+  { label: 'Ok geral tarde (14h47)', valor: '14:47' },
+  { label: 'Início ciclo tarde (15h05)', valor: '15:05' },
   { label: 'Manter-online tarde (18h30)', valor: '18:30' },
+  { label: 'Ok geral 19h (18h47)', valor: '18:47' },
   { label: 'Corte noite (19h05)', valor: '19:05' },
   { label: 'Corte geral (22h05)', valor: '22:05' },
 ]

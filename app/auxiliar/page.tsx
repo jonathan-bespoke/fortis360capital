@@ -5,6 +5,7 @@ import { useEffect, useState, useCallback } from 'react'
 interface FilaEntry { posicao: number; corretorId: string; nome: string; recebeuLeadEm: string | null }
 interface RoletaData { id: string; nome: string; tipo: string; gerencia: string | null; fila: FilaEntry[] }
 interface PresencaData { id: string; corretorId: string; nome: string; gerencia: string; ciclo: string; status: string; entradaMarcadaEm: string; manterOnlineMarcadoEm: string | null; local: string | null }
+interface PainelData { cicloAtivo: string | null; janelaOkGeral: string | null; okGeralJaDado: boolean; data: string; roletas: RoletaData[]; presencas: PresencaData[] }
 
 const statusLabel: Record<string, string> = {
   online: 'Online',
@@ -24,26 +25,13 @@ const janelaLabel: Record<string, string> = { j10h: '10h', j12h: '12h', j15h: '1
 const cicloLabel: Record<string, string> = { c10_12: '10h–12h', c12_15: '12h–15h', c15_19: '15h–19h', c19_22: '19h–22h' }
 
 export default function AuxiliarPage() {
-  const [dados, setDados] = useState<{ cicloAtivo: string | null; data: string; roletas: RoletaData[]; presencas: PresencaData[] } | null>(null)
-  const [janelaOk, setJanelaOk] = useState<string | null>(null)
+  const [dados, setDados] = useState<PainelData | null>(null)
   const [loading, setLoading] = useState(false)
   const [msg, setMsg] = useState('')
 
   const carregar = useCallback(async () => {
-    const [painel, horaRes] = await Promise.all([
-      fetch('/api/auxiliar/painel').then((r) => r.json()),
-      fetch('/api/corretor/fila').then((r) => r.json()).catch(() => null),
-    ])
+    const painel = await fetch('/api/auxiliar/painel').then((r) => r.json())
     setDados(painel)
-    // Determina janela de ok geral ativa via horário do servidor
-    const hora = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit', hour12: false })
-    const [h, m] = hora.split(':').map(Number)
-    const minTotal = h * 60 + m
-    if (minTotal >= 10 * 60 && minTotal < 11 * 60) setJanelaOk('j10h')
-    else if (minTotal >= 12 * 60 && minTotal < 13 * 60) setJanelaOk('j12h')
-    else if (minTotal >= 15 * 60 && minTotal < 16 * 60) setJanelaOk('j15h')
-    else if (minTotal >= 19 * 60 && minTotal < 20 * 60) setJanelaOk('j19h')
-    else setJanelaOk(null)
   }, [])
 
   useEffect(() => {
@@ -53,13 +41,13 @@ export default function AuxiliarPage() {
   }, [carregar])
 
   async function darOkGeral() {
-    if (!janelaOk) return
+    if (!dados?.janelaOkGeral) return
     setLoading(true)
     setMsg('')
     const res = await fetch('/api/auxiliar/ok-geral', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ janela: janelaOk }),
+      body: JSON.stringify({ janela: dados.janelaOkGeral }),
     })
     setLoading(false)
     if (res.ok) {
@@ -94,10 +82,16 @@ export default function AuxiliarPage() {
           </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          {janelaOk && (
-            <button className="btn btn-success" onClick={darOkGeral} disabled={loading}>
-              {loading ? <span className="spinner" /> : `Ok geral (${janelaLabel[janelaOk]})`}
-            </button>
+          {dados?.janelaOkGeral && (
+            dados.okGeralJaDado ? (
+              <span className="badge badge-green" style={{ fontSize: 13, padding: '6px 14px' }}>
+                ✓ Ok geral ({janelaLabel[dados.janelaOkGeral]}) confirmado
+              </span>
+            ) : (
+              <button className="btn btn-success" onClick={darOkGeral} disabled={loading}>
+                {loading ? <span className="spinner" /> : `⚑ Ok geral (${janelaLabel[dados.janelaOkGeral]})`}
+              </button>
+            )
           )}
           <button className="btn btn-ghost" onClick={carregar}>Atualizar</button>
         </div>

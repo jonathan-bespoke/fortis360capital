@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getSession } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { getCicloAtivo, hojeStringBRT, getTempoAtual } from '@/lib/horarios'
+import { getCicloAtivo, getJanelaOkGeralAtiva, hojeStringBRT, getTempoAtual } from '@/lib/horarios'
 
 export async function GET() {
   const session = await getSession()
@@ -12,8 +12,17 @@ export async function GET() {
 
   const agora = await getTempoAtual()
   const ciclo = getCicloAtivo(agora)
+  const janelaOkGeral = getJanelaOkGeralAtiva(agora)
   const data = hojeStringBRT()
   const dataDate = new Date(data + 'T00:00:00')
+
+  let okGeralJaDado = false
+  if (janelaOkGeral) {
+    const ok = await prisma.okGeral.findUnique({
+      where: { data_janela: { data: dataDate, janela: janelaOkGeral as any } },
+    })
+    okGeralJaDado = !!ok
+  }
 
   const roletas = await prisma.roleta.findMany({
     include: {
@@ -35,6 +44,8 @@ export async function GET() {
 
   return NextResponse.json({
     cicloAtivo: ciclo,
+    janelaOkGeral,
+    okGeralJaDado,
     data,
     horaAtual: agora.toISOString(),
     roletas: roletas.map((r: any) => ({

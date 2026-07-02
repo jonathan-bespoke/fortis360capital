@@ -86,12 +86,11 @@ export function isJanelaManterOnlineTarde(agora?: Date): boolean {
 export function getJanelaOkGeralAtiva(agora?: Date): JanelaOkGeral | null {
   const now = agora ?? agoraBRT()
   const min = now.getHours() * 60 + now.getMinutes()
-  // Janela ok geral é nos horários exatos de corte (10h, 12h, 15h, 19h)
-  // Damos uma tolerância de 60 minutos para o auxiliar confirmar
-  if (min >= 10 * 60 && min < 11 * 60) return 'j10h'
-  if (min >= 12 * 60 && min < 13 * 60) return 'j12h'
-  if (min >= 15 * 60 && min < 16 * 60) return 'j15h'
-  if (min >= 19 * 60 && min < 20 * 60) return 'j19h'
+  // 15 min antes de cada ciclo: auxiliar confere quem está online antes da roleta iniciar
+  if (min >= 9 * 60 + 45 && min < 10 * 60) return 'j10h'
+  if (min >= 11 * 60 + 45 && min < 12 * 60) return 'j12h'
+  if (min >= 14 * 60 + 45 && min < 15 * 60) return 'j15h'
+  if (min >= 18 * 60 + 45 && min < 19 * 60) return 'j19h'
   return null
 }
 
