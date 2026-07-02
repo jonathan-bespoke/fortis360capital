@@ -19,7 +19,8 @@ export async function getTempoAtual(): Promise<Date> {
   try {
     const cfg = await prisma.configSistema.findUnique({ where: { chave: 'fake_now' } })
     if (cfg?.valor) {
-      return toZonedTime(new Date(cfg.valor), TZ)
+      // valor salvo como string BRT ("2026-07-02T09:14:00"); converte BRT→UTC→zonedDate
+      return toZonedTime(fromZonedTime(cfg.valor, TZ), TZ)
     }
   } catch {
     // fallback silencioso
