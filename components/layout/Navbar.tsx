@@ -3,6 +3,7 @@
 import { signOut, useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useTheme } from '@/components/ThemeProvider'
 
 const roleLinks: Record<string, { href: string; label: string }[]> = {
   admin: [
@@ -24,6 +25,7 @@ const roleLinks: Record<string, { href: string; label: string }[]> = {
 export default function Navbar() {
   const { data: session } = useSession()
   const pathname = usePathname()
+  const { theme, toggle } = useTheme()
   const role = (session?.user as any)?.role ?? ''
   const links = roleLinks[role] ?? []
 
@@ -41,6 +43,13 @@ export default function Navbar() {
       ))}
       <div className="nav-right">
         <span style={{ fontSize: 13, color: 'var(--text-muted)' }}>{session?.user?.name}</span>
+        <button
+          className="theme-toggle"
+          onClick={toggle}
+          title={theme === 'dark' ? 'Mudar para modo claro' : 'Mudar para modo escuro'}
+        >
+          {theme === 'dark' ? '☀' : '☾'}
+        </button>
         <button className="btn btn-ghost" onClick={() => signOut({ callbackUrl: '/login' })}>
           Sair
         </button>
