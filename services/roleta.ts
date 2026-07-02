@@ -106,11 +106,11 @@ export async function distribuirLead(params: {
 
   if (roleta.tipo === 'individual' && !ciclo) {
     const corretores = await getCorretoresOnlineParaRoleta(params.roletaId, 'c10_12', data)
-    const nomeCorretor = corretores.length > 0
-      ? await getNomeCorretor(corretores[0])
+    const emailCorretor = corretores.length > 0
+      ? await getEmailCorretor(corretores[0])
       : 'Nenhum Corretor Online'
-    await registrarLead(params, null, corretores[0] ?? null, nomeCorretor, null)
-    return nomeCorretor
+    await registrarLead(params, null, corretores[0] ?? null, emailCorretor, null)
+    return emailCorretor
   }
 
   if (!ciclo) {
@@ -131,7 +131,7 @@ export async function distribuirLead(params: {
     `
 
     if (primeiros.length === 0) {
-      return { corretorId: null as string | null, nome: 'Nenhum Corretor Online' }
+      return { corretorId: null as string | null, email: 'Nenhum Corretor Online' }
     }
 
     const primeiro = primeiros[0]
@@ -165,22 +165,22 @@ export async function distribuirLead(params: {
 
     const user = await tx.user.findFirst({
       where: { corretor: { id: primeiro.corretorId } },
-      select: { nome: true },
+      select: { email: true },
     })
 
-    return { corretorId: primeiro.corretorId as string | null, nome: user?.nome ?? 'Corretor' }
+    return { corretorId: primeiro.corretorId as string | null, email: user?.email ?? 'Nenhum Corretor Online' }
   })
 
-  await registrarLead(params, ciclo, resultado.corretorId, resultado.nome, ciclo)
-  return resultado.nome
+  await registrarLead(params, ciclo, resultado.corretorId, resultado.email, ciclo)
+  return resultado.email
 }
 
-async function getNomeCorretor(corretorId: string): Promise<string> {
+async function getEmailCorretor(corretorId: string): Promise<string> {
   const user = await prisma.user.findFirst({
     where: { corretor: { id: corretorId } },
-    select: { nome: true },
+    select: { email: true },
   })
-  return user?.nome ?? 'Corretor'
+  return user?.email ?? 'Nenhum Corretor Online'
 }
 
 async function registrarLead(
