@@ -74,7 +74,7 @@ export async function construirFilaRoleta(
   const corretores = await getCorretoresOnlineParaRoleta(roletaId, ciclo, data)
   const dataDate = new Date(data + 'T00:00:00')
 
-  await prisma.$transaction(async (tx: typeof prisma) => {
+  await prisma.$transaction(async (tx) => {
     await tx.filaRoleta.deleteMany({ where: { roletaId, data: dataDate, ciclo } })
     for (let i = 0; i < corretores.length; i++) {
       await tx.filaRoleta.create({
@@ -117,7 +117,7 @@ export async function distribuirLead(params: {
     return 'Nenhum Corretor Online'
   }
 
-  const resultado = await prisma.$transaction(async (tx: typeof prisma) => {
+  const resultado = await prisma.$transaction(async (tx) => {
     const primeiros = await tx.$queryRaw<{ id: string; corretorId: string; posicao: number }[]>`
       SELECT id, "corretorId", posicao
       FROM fila_roletas
