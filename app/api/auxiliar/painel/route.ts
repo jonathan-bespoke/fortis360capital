@@ -10,18 +10,27 @@ export async function GET() {
     return NextResponse.json({ erro: 'Não autorizado' }, { status: 403 })
   }
 
+  const CICLO_JANELA: Record<string, string> = { c10_12: 'j10h', c12_15: 'j12h', c15_19: 'j15h', c19_22: 'j19h' }
+
   const agora = await getTempoAtual()
   const ciclo = getCicloAtivo(agora)
-  const janelaOkGeral = getJanelaOkGeralAtiva(agora)
+  // Mostra botão na janela pré-ciclo (9h45-10h) OU durante o ciclo se ok geral ainda não foi dado
+  const janelaPreWindow = getJanelaOkGeralAtiva(agora)
   const data = hojeStringBRT()
   const dataDate = new Date(data + 'T00:00:00')
 
+  const janelaCicloAtivo = ciclo ? CICLO_JANELA[ciclo] : null
+  const janelaCandidata = janelaPreWindow ?? janelaCicloAtivo
+
   let okGeralJaDado = false
-  if (janelaOkGeral) {
+  let janelaOkGeral: string | null = null
+  if (janelaCandidata) {
     const ok = await prisma.okGeral.findUnique({
-      where: { data_janela: { data: dataDate, janela: janelaOkGeral as any } },
+      where: { data_janela: { data: dataDate, janela: janelaCandidata as any } },
     })
     okGeralJaDado = !!ok
+    // Só expõe a janela se o ok geral ainda não foi dado
+    janelaOkGeral = ok ? null : janelaCandidata
   }
 
   const roletas = await prisma.roleta.findMany({

@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSession } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { construirTodasAsFilas } from '@/services/roleta'
-import { getJanelaOkGeralAtiva, hojeStringBRT, CicloFila, getTempoAtual } from '@/lib/horarios'
+import { getJanelaOkGeralAtiva, getCicloAtivo, hojeStringBRT, CicloFila, getTempoAtual } from '@/lib/horarios'
+
+const CICLO_JANELA: Record<string, string> = { c10_12: 'j10h', c12_15: 'j12h', c15_19: 'j15h', c19_22: 'j19h' }
 
 export async function POST(req: NextRequest) {
   const session = await getSession()
@@ -13,10 +15,13 @@ export async function POST(req: NextRequest) {
 
   const { janela } = await req.json()
   const agora = await getTempoAtual()
-  const janelaAtiva = getJanelaOkGeralAtiva(agora)
+  const janelaPreWindow = getJanelaOkGeralAtiva(agora)
+  const cicloAtivo = getCicloAtivo(agora)
+  // Aceita: janela na janela de 15 min pré-ciclo OU janela correspondente ao ciclo em curso (confirmação tardia)
+  const janelaPermitida = janelaPreWindow ?? (cicloAtivo ? CICLO_JANELA[cicloAtivo] : null)
 
-  if (!janelaAtiva || janelaAtiva !== janela) {
-    return NextResponse.json({ erro: 'Janela de ok geral não está ativa agora' }, { status: 400 })
+  if (!janelaPermitida || janelaPermitida !== janela) {
+    return NextResponse.json({ erro: 'Nenhum ciclo ativo para este ok geral' }, { status: 400 })
   }
 
   const data = hojeStringBRT()
