@@ -13,12 +13,20 @@ export async function getCorretoresOnlineParaRoleta(
 
   const cicloPresenca = ciclo === 'c10_12' || ciclo === 'c12_15' ? 'manha_10_12' : 'tarde_15_19'
 
+  // Corretores desativados explicitamente nesta roleta (ativo=false)
+  const excluidos = await prisma.roletaCorretor.findMany({
+    where: { roletaId, ativo: false },
+    select: { corretorId: true },
+  })
+  const excluidoIds = excluidos.map((e: { corretorId: string }) => e.corretorId)
+
   if (roleta.tipo === 'diretoria') {
     const presencas = await prisma.presencaDiaria.findMany({
       where: {
         data: new Date(data + 'T00:00:00'),
         ciclo: cicloPresenca,
         status: 'online',
+        ...(excluidoIds.length ? { corretorId: { notIn: excluidoIds } } : {}),
       },
       orderBy: { entradaMarcadaEm: 'asc' },
       select: { corretorId: true },
@@ -31,7 +39,9 @@ export async function getCorretoresOnlineParaRoleta(
       where: { gerenciaId: roleta.gerenciaId! },
       select: { id: true },
     })
-    const ids = corretoresDaGerencia.map((c: { id: string }) => c.id)
+    const ids = corretoresDaGerencia
+      .map((c: { id: string }) => c.id)
+      .filter((id: string) => !excluidoIds.includes(id))
 
     const presencas = await prisma.presencaDiaria.findMany({
       where: {
@@ -46,9 +56,9 @@ export async function getCorretoresOnlineParaRoleta(
     return presencas.map((p: { corretorId: string }) => p.corretorId)
   }
 
-  // Individual
+  // Individual — apenas membros ativos
   const membros = await prisma.roletaCorretor.findMany({
-    where: { roletaId },
+    where: { roletaId, ativo: true },
     select: { corretorId: true },
   })
   const ids = membros.map((m: { corretorId: string }) => m.corretorId)

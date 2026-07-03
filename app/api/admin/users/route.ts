@@ -32,6 +32,7 @@ export async function GET() {
     senhaTrocada: u.senhaTrocadaNoPrimeiroAcesso,
     gerencia: u.corretor?.gerencia?.nome ?? null,
     gerenciaId: u.corretor?.gerenciaId ?? null,
+    corretorId: u.corretor?.id ?? null,
   })))
 }
 

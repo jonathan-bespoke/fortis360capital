@@ -144,6 +144,7 @@ model RoletaCorretor {
   corretorId String
   roleta     Roleta   @relation(fields: [roletaId], references: [id], onDelete: Cascade)
   corretor   Corretor @relation(fields: [corretorId], references: [id], onDelete: Cascade)
+  ativo      Boolean  @default(true)
   createdAt  DateTime @default(now())
 
   @@id([roletaId, corretorId])

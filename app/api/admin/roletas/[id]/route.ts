@@ -31,6 +31,27 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     }
   }
 
+  // desativados: corretor IDs to mark ativo=false; removes previously excluded ones not in list
+  if (body.desativados !== undefined) {
+    const desativados: string[] = body.desativados ?? []
+    // Remove all existing exclusion records for this roleta
+    await prisma.roletaCorretor.deleteMany({
+      where: { roletaId: params.id, ativo: false },
+    })
+    // Upsert exclusion records for newly desativados
+    if (desativados.length > 0) {
+      await Promise.all(
+        desativados.map((corretorId) =>
+          prisma.roletaCorretor.upsert({
+            where: { roletaId_corretorId: { roletaId: params.id, corretorId } },
+            create: { roletaId: params.id, corretorId, ativo: false },
+            update: { ativo: false },
+          })
+        )
+      )
+    }
+  }
+
   return NextResponse.json(roleta)
 }
 
