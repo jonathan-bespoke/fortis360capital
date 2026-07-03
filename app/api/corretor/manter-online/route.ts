@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getSession } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { isJanelaManterOnlineManha, isJanelaManterOnlineTarde, hojeStringBRT, getTempoAtual } from '@/lib/horarios'
+import { isJanelaManterOnlineManha, isJanelaManterOnlineTarde, dataStringDe, getTempoAtual } from '@/lib/horarios'
 
 export async function POST() {
   const session = await getSession()
@@ -22,7 +22,7 @@ export async function POST() {
   const corretor = await prisma.corretor.findUnique({ where: { userId } })
   if (!corretor) return NextResponse.json({ erro: 'Corretor não encontrado' }, { status: 404 })
 
-  const data = hojeStringBRT()
+  const data = dataStringDe(agora)
   const dataDate = new Date(data + 'T00:00:00')
 
   const presenca = await prisma.presencaDiaria.findUnique({

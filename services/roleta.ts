@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma'
-import { getCicloAtivo, hojeStringBRT, CicloFila, getTempoAtual } from '@/lib/horarios'
+import { getCicloAtivo, hojeStringBRT, dataStringDe, CicloFila, getTempoAtual } from '@/lib/horarios'
 
 // Retorna os corretores online no ciclo atual para uma roleta
 export async function getCorretoresOnlineParaRoleta(
@@ -95,7 +95,8 @@ export async function construirFilaRoleta(
 }
 
 export async function construirTodasAsFilas(ciclo: CicloFila): Promise<void> {
-  const data = hojeStringBRT()
+  const agora = await getTempoAtual()
+  const data = dataStringDe(agora)
   const roletas = await prisma.roleta.findMany({ select: { id: true } })
   await Promise.all(roletas.map((r: { id: string }) => construirFilaRoleta(r.id, ciclo, data)))
 }
@@ -215,7 +216,8 @@ async function registrarLead(
 }
 
 export async function aplicarCorteManterOnline(tipo: 'manha' | 'tarde'): Promise<void> {
-  const data = hojeStringBRT()
+  const agora = await getTempoAtual()
+  const data = dataStringDe(agora)
   const dataDate = new Date(data + 'T00:00:00')
   const ciclo = tipo === 'manha' ? 'manha_10_12' : 'tarde_15_19'
 
@@ -226,7 +228,8 @@ export async function aplicarCorteManterOnline(tipo: 'manha' | 'tarde'): Promise
 }
 
 export async function aplicarCorteGeral(): Promise<void> {
-  const data = hojeStringBRT()
+  const agora = await getTempoAtual()
+  const data = dataStringDe(agora)
   const dataDate = new Date(data + 'T00:00:00')
 
   await prisma.presencaDiaria.updateMany({

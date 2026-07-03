@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getSession } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { getCicloAtivo, getJanelaOkGeralAtiva, hojeStringBRT, getTempoAtual } from '@/lib/horarios'
+import { getCicloAtivo, getJanelaOkGeralAtiva, dataStringDe, getTempoAtual } from '@/lib/horarios'
 
 export async function GET() {
   const session = await getSession()
@@ -16,7 +16,7 @@ export async function GET() {
   const ciclo = getCicloAtivo(agora)
   // Mostra botão na janela pré-ciclo (9h45-10h) OU durante o ciclo se ok geral ainda não foi dado
   const janelaPreWindow = getJanelaOkGeralAtiva(agora)
-  const data = hojeStringBRT()
+  const data = dataStringDe(agora)
   const dataDate = new Date(data + 'T00:00:00')
 
   const janelaCicloAtivo = ciclo ? CICLO_JANELA[ciclo] : null

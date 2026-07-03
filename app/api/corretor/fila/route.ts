@@ -3,7 +3,7 @@ import { getSession } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import {
   getCicloAtivo,
-  hojeStringBRT,
+  dataStringDe,
   isJanelaManterOnlineManha,
   isJanelaManterOnlineTarde,
   isJanelaEntradaManha,
@@ -24,7 +24,7 @@ export async function GET() {
   const agora = await getTempoAtual()
   const ciclo = getCicloAtivo(agora)
 
-  const data = hojeStringBRT()
+  const data = dataStringDe(agora)
   const dataDate = new Date(data + 'T00:00:00')
 
   if (!ciclo) {

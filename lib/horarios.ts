@@ -38,6 +38,11 @@ export function hojeStringBRT(): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
+// Versão que usa a data de um agora já carregado (respeita fake_now do DB)
+export function dataStringDe(agora: Date): string {
+  return `${agora.getFullYear()}-${String(agora.getMonth() + 1).padStart(2, '0')}-${String(agora.getDate()).padStart(2, '0')}`
+}
+
 export function dateParaUTC(dataBRT: Date): Date {
   return fromZonedTime(dataBRT, TZ)
 }

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSession } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { construirTodasAsFilas } from '@/services/roleta'
-import { getJanelaOkGeralAtiva, getCicloAtivo, hojeStringBRT, CicloFila, getTempoAtual } from '@/lib/horarios'
+import { getJanelaOkGeralAtiva, getCicloAtivo, dataStringDe, CicloFila, getTempoAtual } from '@/lib/horarios'
 
 const CICLO_JANELA: Record<string, string> = { c10_12: 'j10h', c12_15: 'j12h', c15_19: 'j15h', c19_22: 'j19h' }
 
@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ erro: 'Nenhum ciclo ativo para ativar a roleta' }, { status: 400 })
   }
 
-  const data = hojeStringBRT()
+  const data = dataStringDe(agora)
   const dataDate = new Date(data + 'T00:00:00')
 
   const jaConfirmado = await prisma.okGeral.findUnique({

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSession } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { getCicloAtivo, hojeStringBRT, getTempoAtual } from '@/lib/horarios'
+import { getCicloAtivo, dataStringDe, getTempoAtual } from '@/lib/horarios'
 
 export async function POST(req: NextRequest) {
   const session = await getSession()
@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
   if (!corretorId) return NextResponse.json({ erro: 'corretorId obrigatório' }, { status: 400 })
 
   const agora = await getTempoAtual()
-  const data = hojeStringBRT()
+  const data = dataStringDe(agora)
   const dataDate = new Date(data + 'T00:00:00')
   const ciclo = getCicloAtivo(agora)
 
