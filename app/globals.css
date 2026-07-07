@@ -778,3 +778,16 @@ tr:hover td { background: rgba(222, 187, 85, 0.05); }
   .roletas-table-wrap { display: block; }
   .roletas-cards { display: none; }
 }
+
+/* Home dashboard — roletas grid */
+.roletas-dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+@media (min-width: 640px) {
+  .roletas-dashboard-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1024px) {
+  .roletas-dashboard-grid { grid-template-columns: repeat(3, 1fr); }
+}
