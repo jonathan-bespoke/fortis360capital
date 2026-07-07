@@ -41,20 +41,20 @@ export default function Navbar() {
           <Image src="/logo-horizontal.png" alt="Fortis 360 Capital" height={28} width={160} style={{ objectFit: 'contain', height: 28, width: 'auto' }} priority />
         </Link>
 
-        {/* Links desktop */}
-        <div className="nav-links">
-          {links.map((l) => (
-            <Link
-              key={l.href}
-              href={l.href}
-              className={`nav-link ${pathname === l.href ? 'active' : ''}`}
-            >
-              {l.label}
-            </Link>
-          ))}
-        </div>
-
         <div className="nav-right">
+          {/* Links desktop */}
+          <div className="nav-links">
+            {links.map((l) => (
+              <Link
+                key={l.href}
+                href={l.href}
+                className={`nav-link ${pathname === l.href ? 'active' : ''}`}
+              >
+                {l.label}
+              </Link>
+            ))}
+          </div>
+
           <span className="nav-username">{session?.user?.name}</span>
 
           <button
