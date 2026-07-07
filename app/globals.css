@@ -469,8 +469,9 @@ tr:hover td { background: rgba(222, 187, 85, 0.05); }
     display: flex;
     align-items: center;
     gap: 20px;
-    flex: 1;
-    margin-left: 24px;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
   }
 }
 
