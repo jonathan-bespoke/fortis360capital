@@ -17,8 +17,12 @@ interface Roleta {
 
 interface Gerencia { id: string; nome: string }
 interface Corretor { id: string; nome: string; gerencia: string | null; gerenciaId: string | null; corretorId: string | null; role: string }
+interface FilaEntry { posicao: number; corretorId: string; nome: string; gerencia: string; recebeuLeadEm: string | null }
+interface FilaData { cicloAtivo: string | null; data: string; fila: FilaEntry[] }
 
 const tipoLabel: Record<string, string> = { diretoria: 'Diretoria', gerencia: 'Gerência', individual: 'Individual' }
+const cicloLabel: Record<string, string> = { c10_12: '10h–12h', c12_15: '12h–15h', c15_19: '15h–19h', c19_22: '19h–22h' }
+const tipoBadge: Record<string, string> = { diretoria: 'badge-yellow', gerencia: 'badge-blue', individual: 'badge-gray' }
 
 const emptyForm = { nome: '', tipo: 'diretoria', gerenciaId: '', corretorIds: [] as string[] }
 
@@ -30,9 +34,12 @@ export default function RoletasPage() {
   const [editModal, setEditModal] = useState(false)
   const [editId, setEditId] = useState<string | null>(null)
   const [form, setForm] = useState(emptyForm)
-  // desativados: set of corretorIds marked inactive within gerencia/diretoria roleta
   const [desativados, setDesativados] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(false)
+  const [filaModal, setFilaModal] = useState(false)
+  const [filaRoleta, setFilaRoleta] = useState<Roleta | null>(null)
+  const [filaData, setFilaData] = useState<FilaData | null>(null)
+  const [filaLoading, setFilaLoading] = useState(false)
 
   async function carregar() {
     const [r, g, u] = await Promise.all([
@@ -97,6 +104,16 @@ export default function RoletasPage() {
     setForm(emptyForm)
     setDesativados(new Set())
     carregar()
+  }
+
+  async function abrirFila(r: Roleta) {
+    setFilaRoleta(r)
+    setFilaData(null)
+    setFilaModal(true)
+    setFilaLoading(true)
+    const res = await fetch(`/api/admin/roletas/${r.id}/fila`).then((x) => x.json())
+    setFilaData(res)
+    setFilaLoading(false)
   }
 
   async function excluir(id: string) {
@@ -164,6 +181,7 @@ export default function RoletasPage() {
                   <td>{r.gerencia?.nome ?? '—'}</td>
                   <td>{r.tipo === 'individual' ? r.roletaCorretores.map((rc) => rc.corretor.user.nome).join(', ') || '—' : '—'}</td>
                   <td style={{ display: 'flex', gap: 6 }}>
+                    <button className="btn btn-ghost" style={{ padding: '4px 10px', fontSize: 12 }} onClick={() => abrirFila(r)}>Ver Fila</button>
                     <button className="btn btn-ghost" style={{ padding: '4px 10px', fontSize: 12 }} onClick={() => abrirEditar(r)}>Editar</button>
                     <button className="btn btn-danger" style={{ padding: '4px 10px', fontSize: 12 }} onClick={() => excluir(r.id)}>Excluir</button>
                   </td>
@@ -173,6 +191,92 @@ export default function RoletasPage() {
           </table>
         </div>
       </div>
+
+      {/* Modal: fila ativa */}
+      {filaModal && filaRoleta && (
+        <div className="modal-overlay" onClick={() => setFilaModal(false)}>
+          <div className="modal" style={{ maxWidth: 480 }} onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <div>
+                <span className="modal-title">{filaRoleta.nome}</span>
+                <span className={`badge ${tipoBadge[filaRoleta.tipo] ?? 'badge-gray'}`} style={{ marginLeft: 8, fontSize: '0.6875rem' }}>
+                  {tipoLabel[filaRoleta.tipo]}{filaRoleta.gerencia ? ` · ${filaRoleta.gerencia.nome}` : ''}
+                </span>
+              </div>
+              <button className="btn btn-ghost" style={{ padding: '4px 8px' }} onClick={() => setFilaModal(false)}>✕</button>
+            </div>
+
+            {filaLoading && (
+              <div style={{ display: 'flex', justifyContent: 'center', padding: 32 }}>
+                <span className="spinner" />
+              </div>
+            )}
+
+            {!filaLoading && filaData && (
+              <>
+                {filaData.cicloAtivo ? (
+                  <>
+                    <div style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', marginBottom: 12 }}>
+                      Ciclo ativo: <strong style={{ color: 'var(--text)' }}>{cicloLabel[filaData.cicloAtivo]}</strong>
+                      <span style={{ marginLeft: 10 }}>{filaData.data}</span>
+                    </div>
+
+                    {filaData.fila.length === 0 ? (
+                      <div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '24px 0' }}>
+                        Fila vazia — roleta ainda não foi ativada para este ciclo.
+                      </div>
+                    ) : (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 0, border: '1px solid var(--border)', borderRadius: 8, overflow: 'hidden' }}>
+                        {filaData.fila.map((entry, i) => (
+                          <div
+                            key={entry.corretorId}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 12,
+                              padding: '10px 14px',
+                              borderBottom: i < filaData.fila.length - 1 ? '1px solid var(--border-hairline)' : 'none',
+                              background: entry.recebeuLeadEm ? 'rgba(212,175,55,0.06)' : 'transparent',
+                            }}
+                          >
+                            <div style={{
+                              width: 28, height: 28, borderRadius: '50%', flexShrink: 0,
+                              background: entry.posicao === 1 ? 'var(--gold-gradient)' : 'var(--bg-surface-hover)',
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              fontSize: '0.75rem', fontWeight: 700,
+                              color: entry.posicao === 1 ? 'var(--text-on-gold)' : 'var(--text-muted)',
+                            }}>
+                              {entry.posicao}
+                            </div>
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <div style={{ fontSize: '0.875rem', fontWeight: entry.posicao === 1 ? 600 : 400 }}>{entry.nome}</div>
+                              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{entry.gerencia}</div>
+                            </div>
+                            {entry.recebeuLeadEm && (
+                              <span className="badge badge-yellow" style={{ fontSize: '0.6875rem' }}>Lead recebido</span>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '24px 0' }}>
+                    Nenhum ciclo ativo no momento.
+                  </div>
+                )}
+              </>
+            )}
+
+            <div style={{ marginTop: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <button className="btn btn-ghost" style={{ fontSize: '0.8125rem' }} onClick={() => abrirFila(filaRoleta)}>
+                ↺ Atualizar
+              </button>
+              <button className="btn btn-ghost" onClick={() => setFilaModal(false)}>Fechar</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Modal: criar roleta */}
       {modal && (
