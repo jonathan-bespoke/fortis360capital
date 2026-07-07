@@ -1,7 +1,6 @@
 'use client'
 
 import { useSession } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
 import { useEffect, useState, useCallback } from 'react'
 
 interface FilaEntry {
@@ -102,8 +101,7 @@ function FilaCard({ r, onVerFila }: { r: RoletaAtiva; onVerFila: (r: RoletaAtiva
 }
 
 export default function Home() {
-  const { data: session, status } = useSession()
-  const router = useRouter()
+  const { status } = useSession()
   const [dash, setDash] = useState<DashData | null>(null)
   const [loading, setLoading] = useState(true)
   const [ultimaAtualizacao, setUltimaAtualizacao] = useState<Date | null>(null)
@@ -118,12 +116,10 @@ export default function Home() {
 
   useEffect(() => {
     if (status === 'loading') return
-    if (!session) { router.replace('/login'); return }
-    if (!(session.user as any)?.senhaTrocada) { router.replace('/trocar-senha'); return }
     fetchDash()
     const interval = setInterval(fetchDash, 30_000)
     return () => clearInterval(interval)
-  }, [status, session, router, fetchDash])
+  }, [status, fetchDash])
 
   if (status === 'loading' || loading) {
     return <div style={{ display: 'flex', justifyContent: 'center', padding: 64 }}><span className="spinner" /></div>
