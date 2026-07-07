@@ -32,24 +32,46 @@ const roleLinks: Record<string, { href: string; label: string }[]> = {
   ],
 }
 
+const roleLabel: Record<string, string> = {
+  admin: 'Administrador',
+  gestor_trafego: 'Gestor de Tráfego',
+  auxiliar: 'Auxiliar',
+  corretor: 'Corretor',
+}
+
+function initials(name: string | null | undefined): string {
+  if (!name) return '?'
+  const parts = name.trim().split(/\s+/)
+  return (parts[0][0] + (parts[1]?.[0] ?? '')).toUpperCase()
+}
+
 export default function Navbar() {
   const { data: session } = useSession()
   const pathname = usePathname()
   const { theme, toggle } = useTheme()
   const [menuAberto, setMenuAberto] = useState(false)
+
   const role = (session?.user as any)?.role ?? ''
   const links = roleLinks[role] ?? []
+  const nome = session?.user?.name ?? ''
 
   function fecharMenu() { setMenuAberto(false) }
 
   return (
     <>
       <nav className="nav">
+        {/* Logo */}
         <Link href="/" className="nav-logo">
-          <Image src="/logo-horizontal.png" alt="Fortis 360 Capital" height={28} width={160} style={{ objectFit: 'contain', height: 28, width: 'auto' }} priority />
+          <Image
+            src="/logo-horizontal.png"
+            alt="Fortis 360 Capital"
+            height={28} width={160}
+            style={{ objectFit: 'contain', height: 28, width: 'auto' }}
+            priority
+          />
         </Link>
 
-        {/* Links desktop — centro/esquerda */}
+        {/* Links desktop — centralizados */}
         <div className="nav-links">
           {links.map((l) => (
             <Link
@@ -62,10 +84,18 @@ export default function Navbar() {
           ))}
         </div>
 
-        {/* Controles direita */}
+        {/* Direita: avatar + toggle + sair */}
         <div className="nav-right">
-          <span className="nav-username">{session?.user?.name}</span>
+          {/* Avatar + nome + role */}
+          <div className="nav-user">
+            <div className="nav-avatar" aria-hidden="true">{initials(nome)}</div>
+            <div className="nav-user-info">
+              <span className="nav-user-name">{nome}</span>
+              <span className="nav-user-role">{roleLabel[role]}</span>
+            </div>
+          </div>
 
+          {/* Toggle tema */}
           <button
             className="theme-toggle"
             onClick={toggle}
@@ -74,56 +104,76 @@ export default function Navbar() {
             {theme === 'dark' ? '☀' : '☾'}
           </button>
 
-          {/* Hambúrguer — só mobile */}
-          {links.length > 0 && (
-            <button
-              className="nav-hamburger"
-              onClick={() => setMenuAberto((v) => !v)}
-              aria-label="Menu"
-            >
-              <span style={{ transform: menuAberto ? 'rotate(45deg) translate(5px, 5px)' : undefined }} />
-              <span style={{ opacity: menuAberto ? 0 : 1 }} />
-              <span style={{ transform: menuAberto ? 'rotate(-45deg) translate(5px, -5px)' : undefined }} />
-            </button>
-          )}
-
+          {/* Sair — desktop */}
           <button
-            className="btn btn-ghost nav-sair-desktop"
-            style={{ minHeight: 40, padding: '0 14px', fontSize: '0.8125rem' }}
+            className="nav-logout nav-sair-desktop"
             onClick={() => signOut({ callbackUrl: '/login' })}
           >
-            Sair
+            <span>Sair</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+              <polyline points="16 17 21 12 16 7"/>
+              <line x1="21" y1="12" x2="9" y2="12"/>
+            </svg>
           </button>
+
+          {/* Hambúrguer — mobile */}
+          {links.length > 0 && (
+            <button
+              className={`nav-hamburger${menuAberto ? ' active' : ''}`}
+              onClick={() => setMenuAberto((v) => !v)}
+              aria-label={menuAberto ? 'Fechar menu' : 'Abrir menu'}
+              aria-expanded={menuAberto}
+            >
+              <span />
+              <span />
+              <span />
+            </button>
+          )}
         </div>
       </nav>
 
-      {/* Menu mobile */}
-      {menuAberto && (
-        <div className="nav-mobile-menu">
-          {links.map((l) => (
+      {/* Overlay mobile — full-screen */}
+      <div
+        className={`nav-overlay${menuAberto ? ' open' : ''}`}
+        aria-hidden={!menuAberto}
+        onClick={(e) => { if (e.target === e.currentTarget) fecharMenu() }}
+      >
+        <nav className="nav-overlay-links">
+          {links.map((l, i) => (
             <Link
               key={l.href}
               href={l.href}
-              className={`nav-link ${pathname === l.href ? 'active' : ''}`}
+              className={`nav-overlay-item${pathname === l.href ? ' active' : ''}`}
+              style={{ transitionDelay: menuAberto ? `${0.06 + i * 0.06}s` : '0s' }}
               onClick={fecharMenu}
             >
               {l.label}
             </Link>
           ))}
-          <div style={{ paddingTop: 8, borderTop: '1px solid var(--border-hairline)', marginTop: 4 }}>
-            <div style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', padding: '8px 8px 4px' }}>
-              {session?.user?.name}
+        </nav>
+
+        <div className="nav-overlay-footer">
+          <div className="nav-overlay-user">
+            <div className="nav-avatar nav-avatar-lg">{initials(nome)}</div>
+            <div className="nav-user-info">
+              <span className="nav-user-name">{nome}</span>
+              <span className="nav-user-role">{roleLabel[role]}</span>
             </div>
-            <button
-              className="btn btn-ghost"
-              style={{ width: '100%', marginTop: 4 }}
-              onClick={() => { fecharMenu(); signOut({ callbackUrl: '/login' }) }}
-            >
-              Sair
-            </button>
           </div>
+          <button
+            className="nav-logout nav-logout-full"
+            onClick={() => { fecharMenu(); signOut({ callbackUrl: '/login' }) }}
+          >
+            <span>Sair da conta</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+              <polyline points="16 17 21 12 16 7"/>
+              <line x1="21" y1="12" x2="9" y2="12"/>
+            </svg>
+          </button>
         </div>
-      )}
+      </div>
     </>
   )
 }
