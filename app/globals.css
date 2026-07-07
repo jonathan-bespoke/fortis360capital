@@ -770,3 +770,11 @@ tr:hover td { background: rgba(222, 187, 85, 0.05); }
   }
   .card:hover, .btn-primary:hover, .btn-ghost:hover { transform: none !important; }
 }
+
+/* Roletas page: card/table responsive toggle */
+.roletas-table-wrap { display: none; }
+.roletas-cards { display: block; }
+@media (min-width: 640px) {
+  .roletas-table-wrap { display: block; }
+  .roletas-cards { display: none; }
+}

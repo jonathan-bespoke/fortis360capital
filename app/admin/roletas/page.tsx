@@ -169,7 +169,8 @@ export default function RoletasPage() {
         <button className="btn btn-primary" onClick={() => setModal(true)}>+ Nova roleta</button>
       </div>
 
-      <div className="card">
+      {/* Desktop table */}
+      <div className="card roletas-table-wrap">
         <div className="table-wrap">
           <table>
             <thead><tr><th>Nome</th><th>Tipo</th><th>Gerência</th><th>Corretores (individual)</th><th></th></tr></thead>
@@ -177,7 +178,7 @@ export default function RoletasPage() {
               {roletas.map((r) => (
                 <tr key={r.id}>
                   <td>{r.nome}</td>
-                  <td><span className="badge badge-blue">{tipoLabel[r.tipo]}</span></td>
+                  <td><span className={`badge ${tipoBadge[r.tipo] ?? 'badge-gray'}`}>{tipoLabel[r.tipo]}</span></td>
                   <td>{r.gerencia?.nome ?? '—'}</td>
                   <td>{r.tipo === 'individual' ? r.roletaCorretores.map((rc) => rc.corretor.user.nome).join(', ') || '—' : '—'}</td>
                   <td style={{ display: 'flex', gap: 6 }}>
@@ -190,6 +191,31 @@ export default function RoletasPage() {
             </tbody>
           </table>
         </div>
+      </div>
+
+      {/* Mobile cards */}
+      <div className="roletas-cards">
+        {roletas.map((r) => (
+          <div key={r.id} className="card" style={{ marginBottom: 10 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+              <span style={{ fontWeight: 600, fontSize: '0.9375rem', flex: 1 }}>{r.nome}</span>
+              <span className={`badge ${tipoBadge[r.tipo] ?? 'badge-gray'}`}>{tipoLabel[r.tipo]}</span>
+            </div>
+            {r.gerencia && (
+              <div style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', marginBottom: 4 }}>{r.gerencia.nome}</div>
+            )}
+            {r.tipo === 'individual' && r.roletaCorretores.length > 0 && (
+              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: 8 }}>
+                {r.roletaCorretores.map((rc) => rc.corretor.user.nome).join(', ')}
+              </div>
+            )}
+            <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
+              <button className="btn btn-ghost" style={{ flex: 1, fontSize: '0.8125rem' }} onClick={() => abrirFila(r)}>Ver Fila</button>
+              <button className="btn btn-ghost" style={{ flex: 1, fontSize: '0.8125rem' }} onClick={() => abrirEditar(r)}>Editar</button>
+              <button className="btn btn-danger" style={{ flex: 1, fontSize: '0.8125rem' }} onClick={() => excluir(r.id)}>Excluir</button>
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* Modal: fila ativa */}
