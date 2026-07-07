@@ -77,10 +77,10 @@ export default function Home() {
   )
 
   return (
-    <div style={{ maxWidth: 680, margin: '0 auto' }}>
+    <div style={{ maxWidth: 680, margin: '0 auto', width: '100%' }}>
       <div style={{ marginBottom: 20 }}>
         <h1 style={{ fontSize: '1.375rem', fontWeight: 700, fontFamily: 'var(--font-display)' }}>
-          Roletas ativas
+          Filas
         </h1>
         <div style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', marginTop: 2, display: 'flex', alignItems: 'center', gap: 12 }}>
           {dash.cicloAtivo

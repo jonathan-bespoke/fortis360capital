@@ -9,6 +9,7 @@ import { useTheme } from '@/components/ThemeProvider'
 
 const roleLinks: Record<string, { href: string; label: string }[]> = {
   admin: [
+    { href: '/', label: 'Filas' },
     { href: '/admin', label: 'Usuários' },
     { href: '/admin/gerencias', label: 'Gerências' },
     { href: '/admin/roletas', label: 'Roletas' },
@@ -17,11 +18,18 @@ const roleLinks: Record<string, { href: string; label: string }[]> = {
     { href: '/admin/config-tempo', label: 'Modo Teste' },
   ],
   gestor_trafego: [
+    { href: '/', label: 'Filas' },
     { href: '/gestor/campanhas', label: 'Campanhas' },
     { href: '/gestor/roletas', label: 'Roletas' },
   ],
-  auxiliar: [{ href: '/auxiliar', label: 'Painel da Roleta' }],
-  corretor: [{ href: '/corretor', label: 'Meu Ponto' }],
+  auxiliar: [
+    { href: '/', label: 'Filas' },
+    { href: '/auxiliar', label: 'Painel da Roleta' },
+  ],
+  corretor: [
+    { href: '/', label: 'Filas' },
+    { href: '/corretor', label: 'Meu Ponto' },
+  ],
 }
 
 export default function Navbar() {
