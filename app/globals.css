@@ -477,10 +477,10 @@ tr:hover td { background: rgba(222, 187, 85, 0.05); }
   .nav-links {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 2px;
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
+    flex: 1;
+    padding: 0 16px;
   }
 }
 
