@@ -3,6 +3,7 @@ import { getSession } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
 import { z } from 'zod'
+import { getCicloAtivo, dataStringDe, getTempoAtual } from '@/lib/horarios'
 
 const createSchema = z.object({
   nome: z.string().min(2),
@@ -18,10 +19,28 @@ export async function GET() {
     return NextResponse.json({ erro: 'Não autorizado' }, { status: 403 })
   }
 
-  const users = await prisma.user.findMany({
-    include: { corretor: { include: { gerencia: true } } },
-    orderBy: { nome: 'asc' },
-  })
+  const agora = await getTempoAtual()
+  const ciclo = getCicloAtivo(agora)
+  const data = dataStringDe(agora)
+  const dataDate = new Date(data + 'T00:00:00')
+
+  // Ciclo de presença correspondente
+  const cicloPresenca = ciclo === 'c10_12' || ciclo === 'c12_15' ? 'manha_10_12' : 'tarde_15_19'
+
+  const [users, presencasOnline] = await Promise.all([
+    prisma.user.findMany({
+      include: { corretor: { include: { gerencia: true } } },
+      orderBy: { nome: 'asc' },
+    }),
+    ciclo
+      ? prisma.presencaDiaria.findMany({
+          where: { data: dataDate, ciclo: cicloPresenca, status: 'online' },
+          select: { corretorId: true },
+        })
+      : Promise.resolve([]),
+  ])
+
+  const onlineIds = new Set((presencasOnline as { corretorId: string }[]).map((p) => p.corretorId))
 
   return NextResponse.json(users.map((u: any) => ({
     id: u.id,
@@ -33,6 +52,7 @@ export async function GET() {
     gerencia: u.corretor?.gerencia?.nome ?? null,
     gerenciaId: u.corretor?.gerenciaId ?? null,
     corretorId: u.corretor?.id ?? null,
+    online: u.corretor ? onlineIds.has(u.corretor.id) : false,
   })))
 }
 
