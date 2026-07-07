@@ -37,6 +37,70 @@ const tipoLabel: Record<string, string> = {
 }
 const tipoOrdem: Record<string, number> = { diretoria: 0, gerencia: 1, individual: 2 }
 
+function FilaCard({ r, onVerFila }: { r: RoletaAtiva; onVerFila: (r: RoletaAtiva) => void }) {
+  const preview = r.fila.slice(0, 3)
+  const total = r.fila.length
+
+  return (
+    <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px 10px', borderBottom: '1px solid var(--glass-border)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
+          <span style={{ fontWeight: 600, fontSize: '0.9375rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{r.nome}</span>
+          <span className={`badge ${tipoBadge[r.tipo] ?? 'badge-gray'}`} style={{ fontSize: '0.6875rem', flexShrink: 0 }}>
+            {tipoLabel[r.tipo]}{r.gerencia ? ` · ${r.gerencia.nome}` : ''}
+          </span>
+        </div>
+        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', flexShrink: 0, marginLeft: 8 }}>
+          {total > 0 ? `${total} na fila` : '—'}
+        </span>
+      </div>
+
+      {total === 0 ? (
+        <div style={{ padding: '12px 16px', fontSize: '0.8125rem', color: 'var(--text-muted)' }}>
+          Fila não iniciada
+        </div>
+      ) : (
+        <>
+          <div style={{ padding: '6px 0' }}>
+            {preview.map((entry) => (
+              <div
+                key={entry.corretorId}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 12,
+                  padding: '7px 16px',
+                  background: entry.recebeuLeadEm ? 'rgba(212,175,55,0.06)' : 'transparent',
+                  borderLeft: entry.posicao === 1 ? '2px solid var(--gold-400)' : '2px solid transparent',
+                }}
+              >
+                <div style={{
+                  width: 26, height: 26, borderRadius: '50%', flexShrink: 0,
+                  background: entry.posicao === 1 ? 'var(--gold-gradient)' : 'var(--bg-surface-hover)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: '0.6875rem', fontWeight: 700,
+                  color: entry.posicao === 1 ? 'var(--text-on-gold)' : 'var(--text-muted)',
+                }}>
+                  {entry.posicao}
+                </div>
+                <span style={{ flex: 1, fontSize: '0.875rem', fontWeight: entry.posicao === 1 ? 600 : 400, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {entry.nome}
+                </span>
+                {entry.recebeuLeadEm && (
+                  <span className="badge badge-yellow" style={{ fontSize: '0.625rem', flexShrink: 0 }}>Lead</span>
+                )}
+              </div>
+            ))}
+          </div>
+          <div style={{ borderTop: '1px solid var(--border-hairline)', padding: '8px 16px' }}>
+            <button className="btn btn-ghost" style={{ fontSize: '0.8125rem', width: '100%' }} onClick={() => onVerFila(r)}>
+              {total > 3 ? `Ver fila completa (+${total - 3} mais)` : 'Ver fila completa'}
+            </button>
+          </div>
+        </>
+      )}
+    </div>
+  )
+}
+
 export default function Home() {
   const { data: session, status } = useSession()
   const router = useRouter()
@@ -55,130 +119,63 @@ export default function Home() {
   useEffect(() => {
     if (status === 'loading') return
     if (!session) { router.replace('/login'); return }
-    const u = (session.user as any)
-    if (!u?.senhaTrocada) { router.replace('/trocar-senha'); return }
+    if (!(session.user as any)?.senhaTrocada) { router.replace('/trocar-senha'); return }
     fetchDash()
     const interval = setInterval(fetchDash, 30_000)
     return () => clearInterval(interval)
   }, [status, session, router, fetchDash])
 
   if (status === 'loading' || loading) {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', padding: 64 }}>
-        <span className="spinner" />
-      </div>
-    )
+    return <div style={{ display: 'flex', justifyContent: 'center', padding: 64 }}><span className="spinner" /></div>
   }
 
   if (!dash) return null
 
-  const roletasOrdenadas = [...dash.roletas].sort(
-    (a, b) => (tipoOrdem[a.tipo] ?? 9) - (tipoOrdem[b.tipo] ?? 9) || a.nome.localeCompare(b.nome)
-  )
+  const ordenar = (list: RoletaAtiva[]) =>
+    [...list].sort((a, b) => (tipoOrdem[a.tipo] ?? 9) - (tipoOrdem[b.tipo] ?? 9) || a.nome.localeCompare(b.nome))
+
+  const iniciadas = ordenar(dash.roletas.filter((r) => r.fila.length > 0))
+  const naoIniciadas = ordenar(dash.roletas.filter((r) => r.fila.length === 0))
 
   return (
     <div style={{ maxWidth: 680, margin: '0 auto', width: '100%' }}>
       <div style={{ marginBottom: 20 }}>
-        <h1 style={{ fontSize: '1.375rem', fontWeight: 700, fontFamily: 'var(--font-display)' }}>
-          Filas
-        </h1>
+        <h1 style={{ fontSize: '1.375rem', fontWeight: 700, fontFamily: 'var(--font-display)' }}>Filas</h1>
         <div style={{ fontSize: '0.8125rem', color: 'var(--text-muted)', marginTop: 2, display: 'flex', alignItems: 'center', gap: 12 }}>
           {dash.cicloAtivo
             ? <>Ciclo <strong style={{ color: 'var(--text)', marginLeft: 4 }}>{cicloLabel[dash.cicloAtivo]}</strong></>
             : 'Nenhum ciclo ativo'}
           {ultimaAtualizacao && (
-            <span style={{ opacity: 0.5 }}>
-              · {ultimaAtualizacao.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-            </span>
+            <span style={{ opacity: 0.5 }}>· {ultimaAtualizacao.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
           )}
-          <button className="btn btn-ghost" style={{ fontSize: '0.75rem', minHeight: 28, padding: '0 10px', marginLeft: 4 }} onClick={fetchDash}>
-            ↺
-          </button>
+          <button className="btn btn-ghost" style={{ fontSize: '0.75rem', minHeight: 28, padding: '0 10px' }} onClick={fetchDash}>↺</button>
         </div>
       </div>
 
-      {roletasOrdenadas.length === 0 && (
+      {dash.roletas.length === 0 && (
         <div className="card" style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--text-muted)' }}>
           Nenhuma roleta cadastrada.
         </div>
       )}
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {roletasOrdenadas.map((r) => {
-          const preview = r.fila.slice(0, 3)
-          const total = r.fila.length
-          return (
-            <div key={r.id} className="card" style={{ padding: 0, overflow: 'hidden' }}>
-              {/* Cabeçalho */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px 10px', borderBottom: '1px solid var(--glass-border)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <span style={{ fontWeight: 600, fontSize: '0.9375rem' }}>{r.nome}</span>
-                  <span className={`badge ${tipoBadge[r.tipo] ?? 'badge-gray'}`} style={{ fontSize: '0.6875rem' }}>
-                    {tipoLabel[r.tipo]}{r.gerencia ? ` · ${r.gerencia.nome}` : ''}
-                  </span>
-                </div>
-                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                  {total} na fila
-                </span>
-              </div>
+      {iniciadas.length > 0 && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {iniciadas.map((r) => <FilaCard key={r.id} r={r} onVerFila={setModalRoleta} />)}
+        </div>
+      )}
 
-              {/* Preview — 3 primeiros */}
-              {total === 0 ? (
-                <div style={{ padding: '14px 16px', fontSize: '0.8125rem', color: 'var(--text-muted)' }}>
-                  Fila não iniciada
-                </div>
-              ) : (
-                <div style={{ padding: '6px 0' }}>
-                  {preview.map((entry, i) => (
-                    <div
-                      key={entry.corretorId}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 12,
-                        padding: '7px 16px',
-                        background: entry.recebeuLeadEm ? 'rgba(212,175,55,0.06)' : 'transparent',
-                        borderLeft: entry.posicao === 1 ? '2px solid var(--gold-400)' : '2px solid transparent',
-                      }}
-                    >
-                      <div style={{
-                        width: 26, height: 26, borderRadius: '50%', flexShrink: 0,
-                        background: entry.posicao === 1 ? 'var(--gold-gradient)' : 'var(--bg-surface-hover)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: '0.6875rem', fontWeight: 700,
-                        color: entry.posicao === 1 ? 'var(--text-on-gold)' : 'var(--text-muted)',
-                      }}>
-                        {entry.posicao}
-                      </div>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <span style={{ fontSize: '0.875rem', fontWeight: entry.posicao === 1 ? 600 : 400, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>
-                          {entry.nome}
-                        </span>
-                      </div>
-                      {entry.recebeuLeadEm && (
-                        <span className="badge badge-yellow" style={{ fontSize: '0.625rem' }}>Lead</span>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {/* Rodapé com botão ver fila completa */}
-              {total > 0 && (
-                <div style={{ borderTop: '1px solid var(--border-hairline)', padding: '8px 16px' }}>
-                  <button
-                    className="btn btn-ghost"
-                    style={{ fontSize: '0.8125rem', width: '100%' }}
-                    onClick={() => setModalRoleta(r)}
-                  >
-                    {total > 3 ? `Ver fila completa (+${total - 3} mais)` : 'Ver fila completa'}
-                  </button>
-                </div>
-              )}
+      {naoIniciadas.length > 0 && (
+        <>
+          {iniciadas.length > 0 && (
+            <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', letterSpacing: '0.08em', textTransform: 'uppercase', margin: '24px 0 10px 2px' }}>
+              Aguardando início
             </div>
-          )
-        })}
-      </div>
+          )}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, opacity: 0.4 }}>
+            {naoIniciadas.map((r) => <FilaCard key={r.id} r={r} onVerFila={setModalRoleta} />)}
+          </div>
+        </>
+      )}
 
       {/* Modal fila completa */}
       {modalRoleta && (
@@ -194,7 +191,7 @@ export default function Home() {
               <button className="btn btn-ghost" style={{ padding: '4px 8px' }} onClick={() => setModalRoleta(null)}>✕</button>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 0, border: '1px solid var(--border)', borderRadius: 8, overflow: 'hidden', marginTop: 4 }}>
+            <div style={{ border: '1px solid var(--border)', borderRadius: 8, overflow: 'hidden', marginTop: 4 }}>
               {modalRoleta.fila.map((entry, i) => (
                 <div
                   key={entry.corretorId}
