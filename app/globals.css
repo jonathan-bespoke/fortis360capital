@@ -231,7 +231,6 @@ label {
    ========================================================================== */
 button, .btn {
   cursor: pointer;
-  border: none;
   border-radius: var(--radius-pill);
   padding: 10px 20px;
   min-height: 44px;
@@ -251,7 +250,7 @@ button, .btn {
 .btn-primary {
   background: var(--gold-gradient);
   color: var(--text-on-gold);
-  border: none;
+  border: none !important;
   box-shadow: 0 4px 16px rgba(212, 175, 55, 0.25);
 }
 .btn-primary:hover:not(:disabled)  { filter: brightness(1.08); transform: translateY(-1px); }
