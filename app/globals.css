@@ -91,44 +91,44 @@
 
 /* ---------- Tema LIGHT ---------- */
 [data-theme="light"] {
-  --bg-base:          #FAF8F4;
-  --bg-elevated:      #FFFFFF;
-  --bg-surface:       #FFFFFF;
-  --bg-surface-hover: #F2EFE8;
+  --bg-base:          #7b8fa0;
+  --bg-elevated:      rgba(255, 255, 255, 0.14);
+  --bg-surface:       rgba(255, 255, 255, 0.12);
+  --bg-surface-hover: rgba(255, 255, 255, 0.18);
 
-  --text-primary:   #231F19;
-  --text-secondary: #5C564A;
-  --text-muted:     #8A8377;
-  --text-gold:      #96751A;
-  --text-on-gold:   #FFFFFF;
+  --text-primary:   #FFFFFF;
+  --text-secondary: rgba(255, 255, 255, 0.75);
+  --text-muted:     rgba(255, 255, 255, 0.50);
+  --text-gold:      #D4AF37;
+  --text-on-gold:   #1a1400;
 
-  --border-hairline:        rgba(150, 117, 26, 0.22);
-  --border-hairline-strong: rgba(150, 117, 26, 0.40);
-  --border-neutral:         rgba(35, 31, 25, 0.10);
+  --border-hairline:        rgba(255, 255, 255, 0.20);
+  --border-hairline-strong: rgba(255, 255, 255, 0.35);
+  --border-neutral:         rgba(255, 255, 255, 0.14);
 
-  --success-bg: rgba(111, 174, 133, 0.12);
-  --warning-bg: rgba(212, 165, 55,  0.12);
-  --error-bg:   rgba(193, 104, 94,  0.10);
-  --info-bg:    rgba(123, 159, 176, 0.10);
+  --success-bg: rgba(111, 210, 145, 0.15);
+  --warning-bg: rgba(212, 175, 55,  0.15);
+  --error-bg:   rgba(230, 100, 90,  0.15);
+  --info-bg:    rgba(180, 210, 230, 0.12);
 
-  --shadow-sm:   0 1px 2px   rgba(35,31,25,0.06);
-  --shadow-md:   0 4px 14px  rgba(35,31,25,0.08);
-  --shadow-lg:   0 12px 32px rgba(35,31,25,0.12);
-  --shadow-gold: 0 0 20px    rgba(150,117,26,0.10);
+  --shadow-sm:   0 1px 2px   rgba(0, 0, 0, 0.15);
+  --shadow-md:   0 4px 14px  rgba(0, 0, 0, 0.20);
+  --shadow-lg:   0 12px 32px rgba(0, 0, 0, 0.25);
+  --shadow-gold: 0 0 24px    rgba(212, 175, 55, 0.18);
 
-  --glass-fill:          rgba(255, 255, 255, 0.55);
-  --glass-fill-strong:   rgba(255, 255, 255, 0.68);
-  --glass-border:        rgba(150, 117, 26, 0.18);
-  --glass-border-strong: rgba(150, 117, 26, 0.28);
-  --glass-highlight:     rgba(255, 255, 255, 0.70);
+  --glass-fill:          rgba(255, 255, 255, 0.12);
+  --glass-fill-strong:   rgba(255, 255, 255, 0.20);
+  --glass-border:        rgba(255, 255, 255, 0.28);
+  --glass-border-strong: rgba(255, 255, 255, 0.45);
+  --glass-highlight:     rgba(255, 255, 255, 0.40);
 
-  --bg:       #FAF8F4;
-  --surface:  #FFFFFF;
-  --surface2: #F2EFE8;
-  --border:   rgba(35, 31, 25, 0.10);
-  --text:     #231F19;
+  --bg:       #7b8fa0;
+  --surface:  rgba(255, 255, 255, 0.12);
+  --surface2: rgba(255, 255, 255, 0.08);
+  --border:   rgba(255, 255, 255, 0.14);
+  --text:     #FFFFFF;
 
-  color-scheme: light;
+  color-scheme: dark;
 }
 
 /* ==========================================================================
@@ -159,8 +159,9 @@ body {
 
 [data-theme="light"] body {
   background:
-    radial-gradient(1200px 600px at 15% -10%, rgba(212, 175, 55, 0.10), transparent 60%),
-    radial-gradient(900px 500px at 100% 0%,   rgba(212, 175, 55, 0.06), transparent 55%),
+    radial-gradient(1000px 700px at 80% 10%,  rgba(160, 195, 220, 0.35), transparent 65%),
+    radial-gradient(800px  600px at 10% 80%,  rgba(90,  120, 150, 0.30), transparent 60%),
+    radial-gradient(600px  400px at 50% 50%,  rgba(200, 220, 235, 0.12), transparent 55%),
     var(--bg-base);
   background-attachment: fixed;
 }
@@ -199,9 +200,9 @@ label {
 }
 
 [data-theme="light"] .glass {
-  background: rgba(255, 255, 255, 0.55);
-  border-color: rgba(255, 255, 255, 0.45);
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.28);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.18);
 }
 
 /* Vidro forte — reservado pra navbar */
@@ -215,8 +216,8 @@ label {
 }
 
 [data-theme="light"] .glass-strong {
-  background: rgba(255, 255, 255, 0.70);
-  border-color: rgba(255, 255, 255, 0.60);
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.40);
 }
 
 /* Sólido — badges e botões DENTRO de vidro (nunca empilhar blur) */
@@ -311,17 +312,14 @@ button, .btn {
 
 [data-theme="light"] .btn-secondary,
 [data-theme="light"] .btn-ghost {
-  background: rgba(255, 255, 255, 0.45);
-  border-top:    1px solid rgba(255, 255, 255, 0.80);
-  border-left:   1px solid rgba(255, 255, 255, 0.80);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
-  border-right:  1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.90);
 }
 [data-theme="light"] .btn-success {
-  background: rgba(34, 197, 94, 0.12);
+  background: rgba(34, 197, 94, 0.18);
 }
 [data-theme="light"] .btn-danger {
-  background: rgba(239, 68, 68, 0.10);
+  background: rgba(239, 68, 68, 0.18);
 }
 
 button:disabled, .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none !important; }
@@ -373,9 +371,9 @@ select {
   transition: transform var(--ease-base), box-shadow var(--ease-base);
 }
 [data-theme="light"] .card {
-  background: rgba(255, 255, 255, 0.55);
-  border-color: rgba(255, 255, 255, 0.45);
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.28);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.18);
 }
 .card:hover {
   transform: translateY(-2px);
@@ -492,16 +490,16 @@ tr:hover td { background: rgba(222, 187, 85, 0.05); }
   transition: background var(--ease-base), box-shadow var(--ease-base);
 }
 [data-theme="light"] .nav {
-  background: rgba(255, 255, 255, 0.55);
-  border-top:    1px solid rgba(255, 255, 255, 0.85);
-  border-left:   1px solid rgba(255, 255, 255, 0.85);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.30);
-  border-right:  1px solid rgba(255, 255, 255, 0.30);
+  background: rgba(255, 255, 255, 0.14);
+  border-top:    1px solid rgba(255, 255, 255, 0.45);
+  border-left:   1px solid rgba(255, 255, 255, 0.45);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  border-right:  1px solid rgba(255, 255, 255, 0.12);
   box-shadow:
-    0 8px 32px rgba(28, 25, 23, 0.12),
-    0 2px 8px rgba(28, 25, 23, 0.06),
-    inset 0  2px 4px rgba(255, 255, 255, 0.80),
-    inset 0 -2px 4px rgba(0, 0, 0, 0.04),
+    0 8px 32px rgba(0, 0, 0, 0.20),
+    0 2px 8px rgba(0, 0, 0, 0.12),
+    inset 0  2px 4px rgba(255, 255, 255, 0.30),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.08),
     var(--shadow-gold);
 }
 
@@ -728,11 +726,11 @@ tr:hover td { background: rgba(222, 187, 85, 0.05); }
   transition: opacity 0.35s var(--ease-base);
 }
 [data-theme="light"] .nav-overlay {
-  background: rgba(250, 248, 244, 0.80);
+  background: rgba(80, 100, 120, 0.75);
   backdrop-filter: blur(40px) saturate(180%);
   -webkit-backdrop-filter: blur(40px) saturate(180%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.60);
-  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.50);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.20);
+  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.12);
 }
 .nav-overlay.open {
   opacity: 1;
