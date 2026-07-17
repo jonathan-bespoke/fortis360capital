@@ -138,7 +138,7 @@ export async function distribuirLead(params: {
         AND ciclo = ${ciclo}::"CicloFila"
       ORDER BY posicao ASC
       LIMIT 1
-      FOR UPDATE SKIP LOCKED
+      FOR UPDATE
     `
 
     if (primeiros.length === 0) {
